@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UdemyAuthServer.API.Controllers
+namespace MiniApp3.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

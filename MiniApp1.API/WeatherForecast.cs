@@ -1,6 +1,6 @@
 using System;
 
-namespace UdemyAuthServer.API
+namespace MiniApp1.API
 {
     public class WeatherForecast
     {
