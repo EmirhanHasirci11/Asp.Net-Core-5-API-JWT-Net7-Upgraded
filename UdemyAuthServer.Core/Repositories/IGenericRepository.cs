@@ -12,7 +12,6 @@ namespace UdemyAuthServer.Core.Repositories
         Task<T> GetByIdAsync(int id);
         IQueryable<T> GetAllAsync();
         IQueryable<T> Where(Expression<Func<T,bool>>expression);
-
         Task AddAsync(T entity);
         void Remove(T entity);
         T Update(T entity);
