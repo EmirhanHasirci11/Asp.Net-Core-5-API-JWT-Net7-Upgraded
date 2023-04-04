@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SharedLibrary.Dtos;
 using System;
@@ -32,9 +33,33 @@ namespace UdemyAuthServer.Service.Services
             _genericService = genericService;
         }
 
-        public Task<CustomResponse<TokenDto>> CreateToken(LoginDto loginDto)
-        {            
-            throw new NotImplementedException();
+        public async Task<CustomResponse<TokenDto>> CreateToken(LoginDto loginDto)
+        {
+            if (loginDto is null) throw new ArgumentNullException(nameof(loginDto));
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+            if (user is null) return CustomResponse<TokenDto>.Fail("Email or Password is wrong", 400, true);
+
+            if (! await _userManager.CheckPasswordAsync(user, loginDto.Password)) return CustomResponse<TokenDto>.Fail("Email or Password is wrong", 400, true);
+
+            var token = _tokenService.CreateToken(user);
+
+            var userRefreshToken = await _genericService.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
+            if(userRefreshToken is null)
+            {
+                await _genericService.AddAsync(new UserRefreshToken{ UserId = user.Id, Code = token.RefreshToken, Expiration = token.RefreshTokenExpiration });
+            }
+            else
+            {
+                userRefreshToken.Code = token.RefreshToken;
+                userRefreshToken.Expiration= token.RefreshTokenExpiration;
+            }
+            await _unitOfWork.CommitAsync();
+
+            return CustomResponse<TokenDto>.Success(token, 200);
+
+
+
         }
 
         public Task<CustomResponse<ClientTokenDto>> CreateTokenByClient(ClientLoginDto clientLoginDto)
