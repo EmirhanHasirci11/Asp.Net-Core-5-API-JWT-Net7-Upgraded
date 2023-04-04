@@ -73,9 +73,24 @@ namespace UdemyAuthServer.Service.Services
             return CustomResponse<ClientTokenDto>.Success(token, 200);
         }
 
-        public Task<CustomResponse<TokenDto>> CreateTokenByRefreshToken(string refreshToken)
+        public async Task<CustomResponse<TokenDto>> CreateTokenByRefreshToken(string refreshToken)
         {
-            throw new NotImplementedException();
+            var refreshTokenExist = await _genericService.Where(x => x.Code == refreshToken).SingleOrDefaultAsync();
+            if(refreshTokenExist is null)
+            {
+                return CustomResponse<TokenDto>.Fail("Refresh token not found", 404, true);
+            }
+            var user = await _userManager.FindByIdAsync(refreshTokenExist.UserId);
+            if(user is null)
+            {
+                return CustomResponse<TokenDto>.Fail("User Id not found", 404, true);
+            }
+            var token = _tokenService.CreateToken(user);
+            refreshTokenExist.Expiration = token.RefreshTokenExpiration;
+
+            await _unitOfWork.CommitAsync();
+
+            return CustomResponse<TokenDto>.Success(token, 200);
         }
 
         public Task<CustomResponse<NoDataDto>> RevokeRefreshToken(string refreshToken)
