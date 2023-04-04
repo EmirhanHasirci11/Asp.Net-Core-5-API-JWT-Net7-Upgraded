@@ -62,9 +62,15 @@ namespace UdemyAuthServer.Service.Services
 
         }
 
-        public Task<CustomResponse<ClientTokenDto>> CreateTokenByClient(ClientLoginDto clientLoginDto)
+        public CustomResponse<ClientTokenDto> CreateTokenByClient(ClientLoginDto clientLoginDto)
         {
-            throw new NotImplementedException();
+            var client = _clients.SingleOrDefault(x => x.Id == clientLoginDto.ClientId && x.Secret == clientLoginDto.ClientSecret);
+            if(client is null)
+            {
+                return CustomResponse<ClientTokenDto>.Fail("ClientId or ClientSecret not found", 404, true);
+            }
+            var token =_tokenService.CreateTokenByClient(client);
+            return CustomResponse<ClientTokenDto>.Success(token, 200);
         }
 
         public Task<CustomResponse<TokenDto>> CreateTokenByRefreshToken(string refreshToken)
