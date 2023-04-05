@@ -22,7 +22,7 @@ namespace UdemyAuthServer.Service.Services
         private readonly ITokenService _tokenService;
         private readonly UserManager<AppUser> _userManager;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<UserRefreshToken> _genericService;
+        private readonly IGenericRepository<UserRefreshToken> _genericRepository;
 
         public AuthenticationService(IOptions<List<Client>> optionClient, ITokenService tokenService, UserManager<AppUser> userManager, IUnitOfWork unitOfWork, IGenericRepository<UserRefreshToken> genericService)
         {
@@ -30,7 +30,7 @@ namespace UdemyAuthServer.Service.Services
             _tokenService = tokenService;
             _userManager = userManager;
             _unitOfWork = unitOfWork;
-            _genericService = genericService;
+            _genericRepository = genericService;
         }
 
         public async Task<CustomResponse<TokenDto>> CreateToken(LoginDto loginDto)
@@ -44,10 +44,10 @@ namespace UdemyAuthServer.Service.Services
 
             var token = _tokenService.CreateToken(user);
 
-            var userRefreshToken = await _genericService.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
+            var userRefreshToken = await _genericRepository.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
             if(userRefreshToken is null)
             {
-                await _genericService.AddAsync(new UserRefreshToken{ UserId = user.Id, Code = token.RefreshToken, Expiration = token.RefreshTokenExpiration });
+                await _genericRepository.AddAsync(new UserRefreshToken{ UserId = user.Id, Code = token.RefreshToken, Expiration = token.RefreshTokenExpiration });
             }
             else
             {
@@ -75,7 +75,7 @@ namespace UdemyAuthServer.Service.Services
 
         public async Task<CustomResponse<TokenDto>> CreateTokenByRefreshToken(string refreshToken)
         {
-            var refreshTokenExist = await _genericService.Where(x => x.Code == refreshToken).SingleOrDefaultAsync();
+            var refreshTokenExist = await _genericRepository.Where(x => x.Code == refreshToken).SingleOrDefaultAsync();
             if(refreshTokenExist is null)
             {
                 return CustomResponse<TokenDto>.Fail("Refresh token not found", 404, true);
@@ -93,9 +93,17 @@ namespace UdemyAuthServer.Service.Services
             return CustomResponse<TokenDto>.Success(token, 200);
         }
 
-        public Task<CustomResponse<NoDataDto>> RevokeRefreshToken(string refreshToken)
+        public async Task<CustomResponse<NoDataDto>> RevokeRefreshToken(string refreshToken)
         {
-            throw new NotImplementedException();
+            var refreshTokenExist = await _genericRepository.Where(x => x.Code == refreshToken).SingleOrDefaultAsync();
+            if(refreshTokenExist is null)
+            {
+                return CustomResponse<NoDataDto>.Fail("Refresh token not found", 404, true);
+            }
+            _genericRepository.Remove(refreshTokenExist);
+            await _unitOfWork.CommitAsync();
+
+            return CustomResponse<NoDataDto>.Success(200);
         }
     }
 }
