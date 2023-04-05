@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,8 +13,16 @@ using SharedLibrary.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UdemyAuthServer.Core.Configuration;
+using UdemyAuthServer.Core.Entities;
+using UdemyAuthServer.Core.Repositories;
+using UdemyAuthServer.Core.Services;
+using UdemyAuthServer.Core.UnitOfWork;
+using UdemyAuthServer.Data;
+using UdemyAuthServer.Data.Repositories;
+using UdemyAuthServer.Service.Services;
 
 namespace UdemyAuthServer.API
 {
@@ -25,9 +35,27 @@ namespace UdemyAuthServer.API
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddScoped<IAuthenticationService,AuthenticationService>();
+            services.AddScoped<IUnitOfWork,IUnitOfWork>();
+            services.AddScoped<IUserService,UserService>();
+            services.AddScoped<ITokenService,TokenService>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped(typeof(IGenericService<,>), typeof(GenericService<,>));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServer"), sqlOptions =>
+            {
+                sqlOptions.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
+            }));
+
+            services.AddIdentity<AppUser,IdentityRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 8;
+            }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
             services.Configure<CustomTokenOptions>(Configuration.GetSection("TokenOption"));
             services.Configure<Client>(Configuration.GetSection("Clients"));
@@ -39,7 +67,6 @@ namespace UdemyAuthServer.API
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
