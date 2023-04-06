@@ -24,6 +24,7 @@ using UdemyAuthServer.Core.Services;
 using UdemyAuthServer.Core.UnitOfWork;
 using UdemyAuthServer.Data;
 using UdemyAuthServer.Data.Repositories;
+using UdemyAuthServer.Data.UnitOfWork;
 using UdemyAuthServer.Service.Services;
 
 namespace UdemyAuthServer.API
@@ -42,7 +43,7 @@ namespace UdemyAuthServer.API
         {
 
             services.AddScoped<IAuthenticationService,AuthenticationService>();
-            services.AddScoped<IUnitOfWork,IUnitOfWork>();
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
             services.AddScoped<IUserService,UserService>();
             services.AddScoped<ITokenService,TokenService>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
