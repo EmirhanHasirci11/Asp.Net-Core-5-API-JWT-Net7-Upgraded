@@ -33,7 +33,7 @@ namespace UdemyAuthServer.Service.Services
             _genericRepository = genericService;
         }
 
-        public async Task<CustomResponse<TokenDto>> CreateToken(LoginDto loginDto)
+        public async Task<CustomResponse<TokenDto>> CreateTokenAsync(LoginDto loginDto)
         {
             if (loginDto is null) throw new ArgumentNullException(nameof(loginDto));
             var user = await _userManager.FindByEmailAsync(loginDto.Email);

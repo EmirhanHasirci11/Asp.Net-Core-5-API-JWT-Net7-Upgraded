@@ -10,7 +10,7 @@ namespace UdemyAuthServer.Core.Services
 {
     public interface IAuthenticationService
     {
-        Task<CustomResponse<TokenDto>> CreateToken(LoginDto loginDto);
+        Task<CustomResponse<TokenDto>> CreateTokenAsync(LoginDto loginDto);
         Task<CustomResponse<TokenDto>> CreateTokenByRefreshToken(string refreshToken);
         Task<CustomResponse<NoDataDto>> RevokeRefreshToken(string refreshToken);
 
