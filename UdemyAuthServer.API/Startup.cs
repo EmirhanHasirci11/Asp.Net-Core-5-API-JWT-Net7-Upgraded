@@ -62,7 +62,7 @@ namespace UdemyAuthServer.API
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
             services.Configure<CustomTokenOptions>(Configuration.GetSection("TokenOption"));
-            services.Configure<Client>(Configuration.GetSection("Clients"));
+            services.Configure<List<Client>>(Configuration.GetSection("Clients"));
 
             
                 var tokenOptions = Configuration.GetSection("TokenOption").Get<CustomTokenOptions>();

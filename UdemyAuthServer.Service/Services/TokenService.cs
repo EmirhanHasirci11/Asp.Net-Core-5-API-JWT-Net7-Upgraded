@@ -20,7 +20,7 @@ namespace UdemyAuthServer.Service.Services
     public class TokenService : ITokenService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly CustomTokenOptions _tokenOption;
+        private readonly CustomTokenOptions _tokenOption;        
 
         public TokenService(UserManager<AppUser> userManager, IOptions<CustomTokenOptions> options)
         {
@@ -102,7 +102,7 @@ namespace UdemyAuthServer.Service.Services
             var securityKey = SignService.GetSymmetricSecurityKey(_tokenOption.SecurityKey);
 
             SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
+            Console.WriteLine(client.Id + " " + client.Secret);
             JwtSecurityToken jwtSecurityToken = new JwtSecurityToken(
                 issuer: _tokenOption.Issuer,
                 expires: accessTokenExpiration,
