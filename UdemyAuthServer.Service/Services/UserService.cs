@@ -29,7 +29,7 @@ namespace UdemyAuthServer.Service.Services
                 var errors=result.Errors.Select(x=>x.Description).ToList();
                 return CustomResponse<AppUserDto>.Fail(new ErrorDto(errors, true), 400);
             }
-            return CustomResponse<AppUserDto>.Success(ObjectMapper.Mapper.Map<AppUserDto>(result),200);
+            return CustomResponse<AppUserDto>.Success(ObjectMapper.Mapper.Map<AppUserDto>(user),200);
         }
 
         public async Task<CustomResponse<AppUserDto>> GetUserByNameAsync(string userName)
