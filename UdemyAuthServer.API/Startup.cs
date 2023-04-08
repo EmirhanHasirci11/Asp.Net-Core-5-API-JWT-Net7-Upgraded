@@ -69,7 +69,7 @@ namespace UdemyAuthServer.API
                 var tokenOptions = Configuration.GetSection("TokenOption").Get<CustomTokenOptions>();
             services.AddCustomTokenAuth(tokenOptions);
             services.AddControllers().AddFluentValidation(x=>x.RegisterValidatorsFromAssemblyContaining<Startup>());
-
+            services.AddCustomValidationResponse();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "UdemyAuthServer.API", Version = "v1" });
