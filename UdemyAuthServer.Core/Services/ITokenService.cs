@@ -11,7 +11,7 @@ namespace UdemyAuthServer.Core.Services
 {
     public interface ITokenService
     {
-        TokenDto CreateToken(AppUser appUser);
+        Task<TokenDto> CreateToken(AppUser appUser);
         ClientTokenDto CreateTokenByClient(Client client);
     }
 }

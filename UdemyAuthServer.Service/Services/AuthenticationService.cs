@@ -42,7 +42,7 @@ namespace UdemyAuthServer.Service.Services
 
             if (! await _userManager.CheckPasswordAsync(user, loginDto.Password)) return CustomResponse<TokenDto>.Fail("Email or Password is wrong", 400, true);
 
-            var token = _tokenService.CreateToken(user);
+            var token = await _tokenService.CreateToken(user);
 
             var userRefreshToken = await _genericRepository.Where(x => x.UserId == user.Id).FirstOrDefaultAsync();
             if(userRefreshToken is null)
@@ -85,7 +85,7 @@ namespace UdemyAuthServer.Service.Services
             {
                 return CustomResponse<TokenDto>.Fail("User Id not found", 404, true);
             }
-            var token = _tokenService.CreateToken(user);
+            var token = await _tokenService.CreateToken(user);
             refreshTokenExist.Expiration = token.RefreshTokenExpiration;
 
             await _unitOfWork.CommitAsync();

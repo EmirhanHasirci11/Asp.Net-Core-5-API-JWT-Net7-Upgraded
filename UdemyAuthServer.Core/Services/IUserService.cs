@@ -1,4 +1,5 @@
-﻿using SharedLibrary.Dtos;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using SharedLibrary.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace UdemyAuthServer.Core.Services
     {
         Task<CustomResponse<AppUserDto>> CreateUserAsync(CreateUserDto createUserDto);
         Task<CustomResponse<AppUserDto>> GetUserByNameAsync(string userName);
+        Task<CustomResponse<NoContent>> CreateUserRoles(string userName);
     }
 }
