@@ -49,6 +49,7 @@ namespace UdemyAuthServer.Service.Services
             new Claim(ClaimTypes.NameIdentifier,AppUser.Id),
             new Claim(JwtRegisteredClaimNames.Email, AppUser.Email),
             new Claim(ClaimTypes.Name,AppUser.UserName),
+            new Claim("city",AppUser.City),
             new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 

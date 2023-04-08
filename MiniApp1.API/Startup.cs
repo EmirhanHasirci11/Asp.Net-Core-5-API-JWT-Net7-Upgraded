@@ -32,6 +32,13 @@ namespace MiniApp1.API
             var tokenOptions = Configuration.GetSection("TokenOption").Get<CustomTokenOptions>();
             services.AddCustomTokenAuth(tokenOptions);
             services.AddControllers();
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("AnkaraPolicy", policy =>
+                {
+                    policy.RequireClaim("city", "Ankara");
+                });
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MiniApp1.API", Version = "v1" });
