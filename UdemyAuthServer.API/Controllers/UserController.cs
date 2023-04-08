@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SharedLibrary.Exceptions;
 using System.Threading.Tasks;
 using UdemyAuthServer.Core.Dtos;
 using UdemyAuthServer.Core.Services;
@@ -20,7 +21,7 @@ namespace UdemyAuthServer.API.Controllers
 
         [HttpPost]
         public async Task<IActionResult>CreateUser(CreateUserDto createUserDto)
-        {
+        {            
             return ActionResultInstance(await _userService.CreateUserAsync(createUserDto));
         }
         [Authorize]
