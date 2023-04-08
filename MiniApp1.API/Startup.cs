@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MiniApp1.API.Requirements;
 using SharedLibrary.Configuration;
 using SharedLibrary.Extensions;
 using System;
@@ -32,11 +34,16 @@ namespace MiniApp1.API
             var tokenOptions = Configuration.GetSection("TokenOption").Get<CustomTokenOptions>();
             services.AddCustomTokenAuth(tokenOptions);
             services.AddControllers();
+            services.AddSingleton<IAuthorizationHandler, BirthDayRequirementHandler>();
             services.AddAuthorization(opts =>
             {
                 opts.AddPolicy("AnkaraPolicy", policy =>
                 {
                     policy.RequireClaim("city", "Ankara");
+                });
+                opts.AddPolicy("AgePolicy", policy =>
+                {
+                    policy.Requirements.Add(new BirthdayRequirement(18));
                 });
             });
             services.AddSwaggerGen(c =>

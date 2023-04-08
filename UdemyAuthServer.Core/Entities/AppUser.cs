@@ -10,6 +10,7 @@ namespace UdemyAuthServer.Core.Entities
     public class AppUser:IdentityUser
     {
         public string City{ get; set; }
-        
+        public DateTime BirthDate{ get; set; }
+
     }
 }
